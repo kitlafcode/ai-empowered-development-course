@@ -2,10 +2,14 @@ import { VibeKanbanWebCompanion } from 'vibe-kanban-web-companion';
 import { format, formatDistance, compareAsc, parseISO } from 'date-fns';
 
 const STORAGE_KEY = 'todos';
+const CATEGORIES_KEY = 'categories';
 
 // Todos array (Feature 1)
 let todos = [];
 let nextId = 1;
+
+// Categories (Feature 4)
+let categories = [];
 
 function saveTodos() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
@@ -16,6 +20,26 @@ function loadTodos() {
     if (stored === null) return;
     todos = JSON.parse(stored);
     nextId = todos.length > 0 ? Math.max(...todos.map(t => t.id)) + 1 : 1;
+}
+
+function saveCategories() {
+    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+}
+
+function loadCategories() {
+    const stored = localStorage.getItem(CATEGORIES_KEY);
+    if (stored === null) return;
+    categories = JSON.parse(stored);
+}
+
+function updateCategoryDatalist() {
+    const datalist = document.getElementById('categoriesList');
+    datalist.innerHTML = '';
+    categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        datalist.appendChild(option);
+    });
 }
 
 // Current filter (Feature 2)
@@ -47,6 +71,8 @@ function init() {
     document.getElementById('sortDueDateBtn').addEventListener('click', toggleSortByDueDate);
     document.getElementById('sortCompletedBtn').addEventListener('click', toggleSortByCompletedAt);
 
+    loadCategories();
+    updateCategoryDatalist();
     loadTodos();
     renderTodos();
 }
@@ -60,19 +86,29 @@ function initVibeKanban() {
 function addTodo() {
     const input = document.getElementById('todoInput');
     const dueDateInput = document.getElementById('dueDateInput');
+    const categoryInput = document.getElementById('categoryInput');
     const text = input.value.trim();
+    const category = categoryInput.value.trim();
 
     if (text === '') return;
+
+    if (category && !categories.includes(category)) {
+        categories.push(category);
+        saveCategories();
+        updateCategoryDatalist();
+    }
 
     todos.push({
         id: nextId++,
         text: text,
         completed: false,
-        dueDate: dueDateInput.value || null
+        dueDate: dueDateInput.value || null,
+        category: category || null
     });
 
     input.value = '';
     dueDateInput.value = '';
+    categoryInput.value = '';
     saveTodos();
     renderTodos();
 }
@@ -140,6 +176,9 @@ function renderTodos() {
         if (todo.completedAt) {
             completedDateHtml = `<span class="todo-completed-date">Completed: ${formatCompletedDate(todo.completedAt)}</span>`;
         }
+        const categoryHtml = todo.category
+            ? `<span class="category-badge">${escapeHtml(todo.category)}</span>`
+            : '';
 
         li.innerHTML = `
             <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''}>
@@ -147,6 +186,7 @@ function renderTodos() {
                 <span class="todo-text">${escapeHtml(todo.text)}</span>
                 ${dueDateHtml}
                 ${completedDateHtml}
+                ${categoryHtml}
             </div>
             <button class="todo-delete">Delete</button>
         `;
