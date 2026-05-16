@@ -42,12 +42,26 @@ function updateCategoryDatalist() {
     });
 }
 
+function updateCategoryFilterSelect() {
+    const select = document.getElementById('categoryFilter');
+    select.innerHTML = '<option value="all">All categories</option><option value="uncategorized">Uncategorized</option>';
+    categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        select.appendChild(option);
+    });
+    select.value = currentCategoryFilter;
+}
+
 // Current filter (Feature 2)
 let currentFilter = 'all';
 
 // Sort by due date (Feature 3)
 let sortByDueDate = false;
 let sortByCompletedAt = false;
+
+let currentCategoryFilter = 'all';
 
 document.addEventListener('DOMContentLoaded', () => {
     init();
@@ -70,9 +84,11 @@ function init() {
 
     document.getElementById('sortDueDateBtn').addEventListener('click', toggleSortByDueDate);
     document.getElementById('sortCompletedBtn').addEventListener('click', toggleSortByCompletedAt);
+    document.getElementById('categoryFilter').addEventListener('change', e => setCategoryFilter(e.target.value));
 
     loadCategories();
     updateCategoryDatalist();
+    updateCategoryFilterSelect();
     loadTodos();
     renderTodos();
 }
@@ -96,6 +112,7 @@ function addTodo() {
         categories.push(category);
         saveCategories();
         updateCategoryDatalist();
+        updateCategoryFilterSelect();
     }
 
     todos.push({
@@ -209,6 +226,12 @@ function getFilteredTodos() {
         result = [...todos];
     }
 
+    if (currentCategoryFilter === 'uncategorized') {
+        result = result.filter(t => !t.category);
+    } else if (currentCategoryFilter !== 'all') {
+        result = result.filter(t => t.category === currentCategoryFilter);
+    }
+
     if (sortByDueDate) {
         result = result.slice().sort((a, b) => {
             if (!a.dueDate && !b.dueDate) return 0;
@@ -242,6 +265,11 @@ function setFilter(filter) {
         }
     });
 
+    renderTodos();
+}
+
+function setCategoryFilter(filter) {
+    currentCategoryFilter = filter;
     renderTodos();
 }
 
