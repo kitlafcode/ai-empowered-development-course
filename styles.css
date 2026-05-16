@@ -131,6 +131,17 @@ input[type='date']:valid {
     border-color: var(--color-primary);
 }
 
+select.category-filter-select {
+    padding: 0.5rem 1rem;
+    background-color: #f3f4f6;
+    color: var(--color-text);
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
 /* Todo list (Feature 1) */
 .todoList {
     list-style: none;
