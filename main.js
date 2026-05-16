@@ -23,6 +23,7 @@ let currentFilter = 'all';
 
 // Sort by due date (Feature 3)
 let sortByDueDate = false;
+let sortByCompletedAt = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     init();
@@ -38,12 +39,13 @@ function init() {
         if (e.key === 'Enter') addTodo();
     });
 
-    const filterButtons = document.querySelectorAll('.filter-btn:not(#sortDueDateBtn)');
+    const filterButtons = document.querySelectorAll('.filter-btn:not(#sortDueDateBtn):not(#sortCompletedBtn)');
     filterButtons.forEach(btn => {
         btn.addEventListener('click', () => setFilter(btn.dataset.filter));
     });
 
     document.getElementById('sortDueDateBtn').addEventListener('click', toggleSortByDueDate);
+    document.getElementById('sortCompletedBtn').addEventListener('click', toggleSortByCompletedAt);
 
     loadTodos();
     renderTodos();
@@ -79,6 +81,7 @@ function toggleTodo(id) {
     const todo = todos.find(t => t.id === id);
     if (todo) {
         todo.completed = !todo.completed;
+        todo.completedAt = todo.completed ? new Date().toISOString() : null;
         saveTodos();
         renderTodos();
     }
@@ -88,6 +91,10 @@ function deleteTodo(id) {
     todos = todos.filter(t => t.id !== id);
     saveTodos();
     renderTodos();
+}
+
+function formatCompletedDate(isoStr) {
+    return format(parseISO(isoStr), 'MMM d, yyyy');
 }
 
 // Feature 3: Due date formatting
@@ -129,11 +136,17 @@ function renderTodos() {
             dueDateHtml = `<span class="todo-due-date ${status}">${escapeHtml(formatDueDateDisplay(todo.dueDate))}</span>`;
         }
 
+        let completedDateHtml = '';
+        if (todo.completedAt) {
+            completedDateHtml = `<span class="todo-completed-date">Completed: ${formatCompletedDate(todo.completedAt)}</span>`;
+        }
+
         li.innerHTML = `
             <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''}>
             <div class="todo-content">
                 <span class="todo-text">${escapeHtml(todo.text)}</span>
                 ${dueDateHtml}
+                ${completedDateHtml}
             </div>
             <button class="todo-delete">Delete</button>
         `;
@@ -165,6 +178,15 @@ function getFilteredTodos() {
         });
     }
 
+    if (sortByCompletedAt) {
+        result = result.slice().sort((a, b) => {
+            if (!a.completedAt && !b.completedAt) return 0;
+            if (!a.completedAt) return 1;
+            if (!b.completedAt) return -1;
+            return compareAsc(parseISO(a.completedAt), parseISO(b.completedAt));
+        });
+    }
+
     return result;
 }
 
@@ -172,7 +194,7 @@ function getFilteredTodos() {
 function setFilter(filter) {
     currentFilter = filter;
 
-    const filterButtons = document.querySelectorAll('.filter-btn:not(#sortDueDateBtn)');
+    const filterButtons = document.querySelectorAll('.filter-btn:not(#sortDueDateBtn):not(#sortCompletedBtn)');
     filterButtons.forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.filter === filter) {
@@ -186,8 +208,21 @@ function setFilter(filter) {
 // Feature 3: Toggle sort by due date
 function toggleSortByDueDate() {
     sortByDueDate = !sortByDueDate;
-    const sortBtn = document.getElementById('sortDueDateBtn');
-    sortBtn.classList.toggle('active', sortByDueDate);
+    if (sortByDueDate) {
+        sortByCompletedAt = false;
+        document.getElementById('sortCompletedBtn').classList.remove('active');
+    }
+    document.getElementById('sortDueDateBtn').classList.toggle('active', sortByDueDate);
+    renderTodos();
+}
+
+function toggleSortByCompletedAt() {
+    sortByCompletedAt = !sortByCompletedAt;
+    if (sortByCompletedAt) {
+        sortByDueDate = false;
+        document.getElementById('sortDueDateBtn').classList.remove('active');
+    }
+    document.getElementById('sortCompletedBtn').classList.toggle('active', sortByCompletedAt);
     renderTodos();
 }
 
