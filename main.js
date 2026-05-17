@@ -62,6 +62,8 @@ let sortByDueDate = false;
 let sortByCompletedAt = false;
 let sortByPriority = true;
 
+let filterFavorites = false;
+
 let currentCategoryFilter = 'all';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -78,7 +80,7 @@ function init() {
         if (e.key === 'Enter') addTodo();
     });
 
-    const filterButtons = document.querySelectorAll('.filter-btn:not(#sortDueDateBtn):not(#sortCompletedBtn)');
+    const filterButtons = document.querySelectorAll('.filter-btn:not(#sortDueDateBtn):not(#sortCompletedBtn):not(#sortPriorityBtn):not(#filterFavoritesBtn)');
     filterButtons.forEach(btn => {
         btn.addEventListener('click', () => setFilter(btn.dataset.filter));
     });
@@ -86,6 +88,7 @@ function init() {
     document.getElementById('sortDueDateBtn').addEventListener('click', toggleSortByDueDate);
     document.getElementById('sortCompletedBtn').addEventListener('click', toggleSortByCompletedAt);
     document.getElementById('sortPriorityBtn').addEventListener('click', toggleSortByPriority);
+    document.getElementById('filterFavoritesBtn').addEventListener('click', toggleFilterFavorites);
     document.getElementById('categoryFilter').addEventListener('change', e => setCategoryFilter(e.target.value));
 
     loadCategories();
@@ -151,6 +154,15 @@ function deleteTodo(id) {
     renderTodos();
 }
 
+function toggleFavorite(id) {
+    const todo = todos.find(t => t.id === id);
+    if (todo) {
+        todo.favorite = !(todo.favorite ?? false);
+        saveTodos();
+        renderTodos();
+    }
+}
+
 function formatCompletedDate(isoStr) {
     return format(parseISO(isoStr), 'MMM d, yyyy');
 }
@@ -181,6 +193,11 @@ function renderTodos() {
     const todoList = document.getElementById('todoList');
     const filteredTodos = getFilteredTodos();
 
+    if (filteredTodos.length === 0 && filterFavorites) {
+        todoList.innerHTML = '<li class="empty-state">No favorites yet.</li>';
+        return;
+    }
+
     todoList.innerHTML = '';
 
     filteredTodos.forEach(todo => {
@@ -206,6 +223,9 @@ function renderTodos() {
             ? `<span class="priority-badge priority-${todo.priority}">${todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}</span>`
             : '';
 
+        const isFavorited = todo.favorite ?? false;
+        const starLabel = isFavorited ? 'Remove from favorites' : 'Mark as favorite';
+
         li.innerHTML = `
             <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''}>
             <div class="todo-content">
@@ -216,10 +236,12 @@ function renderTodos() {
                 ${priorityHtml}
             </div>
             <button class="todo-delete">Delete</button>
+            <button class="star-btn${isFavorited ? ' favorited' : ''}" aria-label="${starLabel}" aria-pressed="${isFavorited}">${isFavorited ? '★' : '☆'}</button>
         `;
 
         li.querySelector('.todo-checkbox').addEventListener('change', () => toggleTodo(todo.id));
         li.querySelector('.todo-delete').addEventListener('click', () => deleteTodo(todo.id));
+        li.querySelector('.star-btn').addEventListener('click', () => toggleFavorite(todo.id));
 
         todoList.appendChild(li);
     });
@@ -240,6 +262,10 @@ function getFilteredTodos() {
         result = result.filter(t => !t.category);
     } else if (currentCategoryFilter !== 'all') {
         result = result.filter(t => t.category === currentCategoryFilter);
+    }
+
+    if (filterFavorites) {
+        result = result.filter(t => t.favorite ?? false);
     }
 
     if (sortByDueDate) {
@@ -276,7 +302,7 @@ function getFilteredTodos() {
 function setFilter(filter) {
     currentFilter = filter;
 
-    const filterButtons = document.querySelectorAll('.filter-btn:not(#sortDueDateBtn):not(#sortCompletedBtn)');
+    const filterButtons = document.querySelectorAll('.filter-btn:not(#sortDueDateBtn):not(#sortCompletedBtn):not(#sortPriorityBtn):not(#filterFavoritesBtn)');
     filterButtons.forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.filter === filter) {
@@ -326,6 +352,12 @@ function toggleSortByPriority() {
         document.getElementById('sortCompletedBtn').classList.remove('active');
     }
     document.getElementById('sortPriorityBtn').classList.toggle('active', sortByPriority);
+    renderTodos();
+}
+
+function toggleFilterFavorites() {
+    filterFavorites = !filterFavorites;
+    document.getElementById('filterFavoritesBtn').classList.toggle('active', filterFavorites);
     renderTodos();
 }
 
