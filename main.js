@@ -60,6 +60,7 @@ let currentFilter = 'all';
 // Sort by due date (Feature 3)
 let sortByDueDate = false;
 let sortByCompletedAt = false;
+let sortByPriority = true;
 
 let currentCategoryFilter = 'all';
 
@@ -84,6 +85,7 @@ function init() {
 
     document.getElementById('sortDueDateBtn').addEventListener('click', toggleSortByDueDate);
     document.getElementById('sortCompletedBtn').addEventListener('click', toggleSortByCompletedAt);
+    document.getElementById('sortPriorityBtn').addEventListener('click', toggleSortByPriority);
     document.getElementById('categoryFilter').addEventListener('change', e => setCategoryFilter(e.target.value));
 
     loadCategories();
@@ -103,6 +105,7 @@ function addTodo() {
     const input = document.getElementById('todoInput');
     const dueDateInput = document.getElementById('dueDateInput');
     const categoryInput = document.getElementById('categoryInput');
+    const priorityInput = document.getElementById('priorityInput');
     const text = input.value.trim();
     const category = categoryInput.value.trim();
 
@@ -120,12 +123,14 @@ function addTodo() {
         text: text,
         completed: false,
         dueDate: dueDateInput.value || null,
-        category: category || null
+        category: category || null,
+        priority: priorityInput.value || null
     });
 
     input.value = '';
     dueDateInput.value = '';
     categoryInput.value = '';
+    priorityInput.value = '';
     saveTodos();
     renderTodos();
 }
@@ -197,6 +202,10 @@ function renderTodos() {
             ? `<span class="category-badge">${escapeHtml(todo.category)}</span>`
             : '';
 
+        const priorityHtml = todo.priority
+            ? `<span class="priority-badge priority-${todo.priority}">${todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}</span>`
+            : '';
+
         li.innerHTML = `
             <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''}>
             <div class="todo-content">
@@ -204,6 +213,7 @@ function renderTodos() {
                 ${dueDateHtml}
                 ${completedDateHtml}
                 ${categoryHtml}
+                ${priorityHtml}
             </div>
             <button class="todo-delete">Delete</button>
         `;
@@ -250,6 +260,15 @@ function getFilteredTodos() {
         });
     }
 
+    const PRIORITY_ORDER = { high: 1, medium: 2, low: 3 };
+    if (sortByPriority) {
+        result = result.slice().sort((a, b) => {
+            const pa = PRIORITY_ORDER[a.priority] ?? 4;
+            const pb = PRIORITY_ORDER[b.priority] ?? 4;
+            return pa - pb;
+        });
+    }
+
     return result;
 }
 
@@ -278,7 +297,9 @@ function toggleSortByDueDate() {
     sortByDueDate = !sortByDueDate;
     if (sortByDueDate) {
         sortByCompletedAt = false;
+        sortByPriority = false;
         document.getElementById('sortCompletedBtn').classList.remove('active');
+        document.getElementById('sortPriorityBtn').classList.remove('active');
     }
     document.getElementById('sortDueDateBtn').classList.toggle('active', sortByDueDate);
     renderTodos();
@@ -288,9 +309,23 @@ function toggleSortByCompletedAt() {
     sortByCompletedAt = !sortByCompletedAt;
     if (sortByCompletedAt) {
         sortByDueDate = false;
+        sortByPriority = false;
         document.getElementById('sortDueDateBtn').classList.remove('active');
+        document.getElementById('sortPriorityBtn').classList.remove('active');
     }
     document.getElementById('sortCompletedBtn').classList.toggle('active', sortByCompletedAt);
+    renderTodos();
+}
+
+function toggleSortByPriority() {
+    sortByPriority = !sortByPriority;
+    if (sortByPriority) {
+        sortByDueDate = false;
+        sortByCompletedAt = false;
+        document.getElementById('sortDueDateBtn').classList.remove('active');
+        document.getElementById('sortCompletedBtn').classList.remove('active');
+    }
+    document.getElementById('sortPriorityBtn').classList.toggle('active', sortByPriority);
     renderTodos();
 }
 
