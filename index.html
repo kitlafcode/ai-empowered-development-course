@@ -20,6 +20,12 @@
                     <input type="date" id="dueDateInput">
                     <input type="text" id="categoryInput" list="categoriesList" placeholder="Category (optional)">
                     <datalist id="categoriesList"></datalist>
+                    <select id="priorityInput">
+                        <option value="">No priority</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
                 </div>
                 <button id="addBtn">Add</button>
             </div>
@@ -30,6 +36,7 @@
                 <button class="filter-btn" data-filter="completed">Completed</button>
                 <button class="filter-btn sort-btn" id="sortDueDateBtn">Sort by due date</button>
                 <button class="filter-btn sort-btn" id="sortCompletedBtn">Sort by completion date</button>
+                <button class="filter-btn sort-btn active" id="sortPriorityBtn">Sort by priority</button>
                 <select id="categoryFilter" class="category-filter-select">
                     <option value="all">All categories</option>
                     <option value="uncategorized">Uncategorized</option>

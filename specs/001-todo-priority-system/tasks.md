@@ -20,7 +20,7 @@
 
 **Purpose**: Confirm integration points in the existing codebase — no new project structure needed.
 
-- [ ] T001 Review `addTodo()` (main.js:102–131), `renderTodos()` (main.js:175–216), and `getFilteredTodos()` (main.js:219–254) to confirm insertion points before making changes
+- [X] T001 Review `addTodo()` (main.js:102–131), `renderTodos()` (main.js:175–216), and `getFilteredTodos()` (main.js:219–254) to confirm insertion points before making changes
 
 ---
 
@@ -30,7 +30,7 @@
 
 **⚠️ CRITICAL**: Must complete before any user story work begins.
 
-- [ ] T002 In `addTodo()` in `main.js`, add `priority: priorityInput.value || null` to the `todos.push({...})` call and add `priorityInput.value = '';` to the clear block — establishes data model for all downstream tasks
+- [X] T002 In `addTodo()` in `main.js`, add `priority: priorityInput.value || null` to the `todos.push({...})` call and add `priorityInput.value = '';` to the clear block — establishes data model for all downstream tasks
 
 **Checkpoint**: Todo objects now carry optional `priority` field; localStorage serialization automatic.
 
@@ -44,10 +44,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Add priority `<select id="priorityInput">` with options (No priority / High / Medium / Low) inside `.input-fields` div after `#categoryInput` in `index.html`
-- [ ] T004 [P] [US1] Read `document.getElementById('priorityInput')` at the top of `addTodo()` in `main.js` (alongside existing input reads at line 103–106)
-- [ ] T005 [US1] Add `priorityHtml` badge to `renderTodos()` in `main.js`: build `<span class="priority-badge priority-${todo.priority}">...</span>` when `todo.priority` is truthy; insert into `li.innerHTML` alongside `categoryHtml`
-- [ ] T006 [P] [US1] Add priority badge CSS to `styles.css`: `.priority-badge` base styles (pill shape matching `.category-badge`), `.priority-badge.priority-high` (red: `#fee2e2` / `#dc2626`), `.priority-badge.priority-medium` (amber: `#fef3c7` / `#d97706`), `.priority-badge.priority-low` (green: `#dcfce7` / `#16a34a`)
+- [X] T003 [US1] Add priority `<select id="priorityInput">` with options (No priority / High / Medium / Low) inside `.input-fields` div after `#categoryInput` in `index.html`
+- [X] T004 [P] [US1] Read `document.getElementById('priorityInput')` at the top of `addTodo()` in `main.js` (alongside existing input reads at line 103–106)
+- [X] T005 [US1] Add `priorityHtml` badge to `renderTodos()` in `main.js`: build `<span class="priority-badge priority-${todo.priority}">...</span>` when `todo.priority` is truthy; insert into `li.innerHTML` alongside `categoryHtml`
+- [X] T006 [P] [US1] Add priority badge CSS to `styles.css`: `.priority-badge` base styles (pill shape matching `.category-badge`), `.priority-badge.priority-high` (red: `#fee2e2` / `#dc2626`), `.priority-badge.priority-medium` (amber: `#fef3c7` / `#d97706`), `.priority-badge.priority-low` (green: `#dcfce7` / `#16a34a`)
 
 **Checkpoint**: User Story 1 fully functional — priority selection, badge display, and persistence all work independently.
 
@@ -61,12 +61,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T007 [US2] Add `let sortByPriority = true;` state variable in `main.js` after the `sortByCompletedAt` declaration (line 62)
-- [ ] T008 [US2] Add priority sort block in `getFilteredTodos()` in `main.js` after the `sortByCompletedAt` block: define `PRIORITY_ORDER = { high: 1, medium: 2, low: 3 }`, sort using `?? 4` for null/undefined priority
-- [ ] T009 [US2] Add `toggleSortByPriority()` function in `main.js` following the same mutual-exclusion pattern as `toggleSortByDueDate()`: deactivate both other sorts and their buttons when priority sort activates
-- [ ] T010 [US2] Update `toggleSortByDueDate()` and `toggleSortByCompletedAt()` in `main.js` to also clear `sortByPriority = false` and remove `active` from `#sortPriorityBtn` when they activate
-- [ ] T011 [US2] Add `<button class="filter-btn sort-btn active" id="sortPriorityBtn">Sort by priority</button>` to the `.filters` div in `index.html` after `#sortCompletedBtn` — starts with `active` class since sort is default-on
-- [ ] T012 [US2] Wire `document.getElementById('sortPriorityBtn').addEventListener('click', toggleSortByPriority)` in `init()` in `main.js`
+- [X] T007 [US2] Add `let sortByPriority = true;` state variable in `main.js` after the `sortByCompletedAt` declaration (line 62)
+- [X] T008 [US2] Add priority sort block in `getFilteredTodos()` in `main.js` after the `sortByCompletedAt` block: define `PRIORITY_ORDER = { high: 1, medium: 2, low: 3 }`, sort using `?? 4` for null/undefined priority
+- [X] T009 [US2] Add `toggleSortByPriority()` function in `main.js` following the same mutual-exclusion pattern as `toggleSortByDueDate()`: deactivate both other sorts and their buttons when priority sort activates
+- [X] T010 [US2] Update `toggleSortByDueDate()` and `toggleSortByCompletedAt()` in `main.js` to also clear `sortByPriority = false` and remove `active` from `#sortPriorityBtn` when they activate
+- [X] T011 [US2] Add `<button class="filter-btn sort-btn active" id="sortPriorityBtn">Sort by priority</button>` to the `.filters` div in `index.html` after `#sortCompletedBtn` — starts with `active` class since sort is default-on
+- [X] T012 [US2] Wire `document.getElementById('sortPriorityBtn').addEventListener('click', toggleSortByPriority)` in `init()` in `main.js`
 
 **Checkpoint**: User Story 2 fully functional — default priority order, toggle behavior, and mutual exclusion with other sorts all work.
 
@@ -76,9 +76,9 @@
 
 **Purpose**: Code quality and backward compatibility verification.
 
-- [ ] T013 [P] Run `npm run lint` and fix any ESLint or stylelint errors across `main.js`, `index.html`, and `styles.css`
-- [ ] T014 Clear localStorage in browser dev tools, reload, confirm app works with no stored todos. Then add mixed-priority todos, reload, confirm priorities persist correctly.
-- [ ] T015 [P] Manually verify backward compatibility: open browser console, run `localStorage.setItem('todos', JSON.stringify([{id:1,text:"old todo",completed:false}]))` then reload — confirm old todo appears at bottom of priority-sorted list with no badge and no errors
+- [X] T013 [P] Run `npm run lint` and fix any ESLint or stylelint errors across `main.js`, `index.html`, and `styles.css`
+- [X] T014 Clear localStorage in browser dev tools, reload, confirm app works with no stored todos. Then add mixed-priority todos, reload, confirm priorities persist correctly.
+- [X] T015 [P] Manually verify backward compatibility: open browser console, run `localStorage.setItem('todos', JSON.stringify([{id:1,text:"old todo",completed:false}]))` then reload — confirm old todo appears at bottom of priority-sorted list with no badge and no errors
 
 ---
 

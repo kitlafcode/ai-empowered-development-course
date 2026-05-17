@@ -251,3 +251,26 @@ select.category-filter-select {
     border-radius: 9999px;
     padding: 0.1rem 0.5rem;
 }
+
+.priority-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    border-radius: 9999px;
+    padding: 0.1rem 0.5rem;
+}
+
+.priority-badge.priority-high {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.priority-badge.priority-medium {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.priority-badge.priority-low {
+    background: #dcfce7;
+    color: #16a34a;
+}
