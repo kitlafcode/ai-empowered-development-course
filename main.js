@@ -357,7 +357,9 @@ function toggleSortByPriority() {
 
 function toggleFilterFavorites() {
     filterFavorites = !filterFavorites;
-    document.getElementById('filterFavoritesBtn').classList.toggle('active', filterFavorites);
+    const btn = document.getElementById('filterFavoritesBtn');
+    btn.classList.toggle('active', filterFavorites);
+    btn.setAttribute('aria-pressed', filterFavorites ? 'true' : 'false');
     renderTodos();
 }
 
